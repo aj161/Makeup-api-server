@@ -7,6 +7,8 @@ const mongoose = require("mongoose");
 
 const app = express();
 app.use(cors());
+// Adding global midleware to parse incoming json requests
+app.use(express.json());
 const PORT = process.env.PORT;
 
 // Connect my Node app to cat database in MongoDB server
@@ -67,11 +69,13 @@ pencil.save();
 serum.save();
 }
 
-seedMakeupCollection();
+//seedMakeupCollection();
 
 // proof of life
 app.get("/products", getProductsHandler);
 app.get("/products/:id", getProductByIdHandler);
+app.get("/productbybrand", getProductsByBrand);
+app.post("/product", addProductHandler);
 
 function getProductsHandler(req, res) {
   // let catsData = await catModel.find({});
@@ -92,6 +96,40 @@ function getProductsHandler(req, res) {
 async function getProductByIdHandler(req, res) {
   const specificProduct = await productModel.findById(req.params.id);
   res.send(specificProduct);
+}
+
+//localhost:3001/productbybrand?brand=boosh
+async function getProductsByBrand(req,res) {
+  const brand = req.query.brand;
+
+productModel.find({ brand }, function(err,selectedProducts) {
+  if(err) {
+    response.send(`error in getting product info >> ${err}`)
+  } else {
+    res.send(selectedProducts)
+  }
+})
+}
+
+async function addProductHandler(req,res) {
+  console.log(req.body);
+  console.log(req.body.name);
+  const name = req.body.name;
+  const brand = req.body.brand;
+  const price = req.body.price;
+  const imageUrl = req.body.imageUrl;
+  const description = req.body.description;
+  
+  let newProduct = await productModel.create({name, brand, price, imageUrl, description});
+  
+  productModel.find({}, function(err,allProducts) {
+    if(err) {
+      response.send(`error in getting cats info >> ${err}`)
+    } else {
+      res.send(allProducts)
+    }
+  })
+
 }
 
 app.listen(PORT, () => {
