@@ -76,6 +76,8 @@ app.get("/products", getProductsHandler);
 app.get("/products/:id", getProductByIdHandler);
 app.get("/productbybrand", getProductsByBrand);
 app.post("/product", addProductHandler);
+app.delete('/product/:id', deleteProductHandler);
+app.put('/product/:id', updateProductHandler);
 
 function getProductsHandler(req, res) {
   // let catsData = await catModel.find({});
@@ -129,7 +131,35 @@ async function addProductHandler(req,res) {
       res.send(allProducts)
     }
   })
+}
 
+// localhost:3001/product/6398da68cfbeecf6b97c2848 >> DELETE - using params
+async function deleteProductHandler(req,res){
+  let id = req.params.id;
+
+  productModel.findByIdAndDelete(id, async function(error, deletedProduct){
+    if(error){
+      console.log(error);
+      res.send(`Error was encountered ${error}`);
+    } else {
+      console.log(deletedProduct);
+      let productsData = await productModel.find({});
+      res.send(productsData);
+    }
+    })
+    };
+  
+// localhost:3001/product/6398d7d651967507b9fbecea >> UPDATE (put)
+async function updateProductHandler(req,res){
+  console.log(req.params);
+  console.log(req.body);
+  const {name, brand, price, imageUrl,description } = req.body;
+  const id = req.params.id;
+  // or const {id} = req.params;
+  const updatedProduct = await productModel.findByIdAndUpdate(id, {name, brand, price,imageUrl,description });
+  console.log(updatedProduct);
+  let productsData = await productModel.find({});
+  res.send(productsData);
 }
 
 app.listen(PORT, () => {
