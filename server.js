@@ -12,7 +12,7 @@ app.use(express.json());
 const PORT = process.env.PORT;
 
 // Connect my Node app to cat database in MongoDB server
-mongoose.connect("mongodb://127.0.0.1:27017/makeup");
+mongoose.connect(process.env.DATABASE_URL);
 
 // Collection : Schema and model
 // Schema: determine the shape of our data || Blueprint or template for our collection
