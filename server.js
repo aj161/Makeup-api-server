@@ -18,6 +18,7 @@ mongoose.connect("mongodb://127.0.0.1:27017/makeup");
 // Schema: determine the shape of our data || Blueprint or template for our collection
 
 const productSchema = new mongoose.Schema({
+  username: String,
   name: String,
   brand: String,
   price: Number,
@@ -32,6 +33,7 @@ const productModel = mongoose.model('products', productSchema); //collection cal
 // Seed (or populate) our database
 function seedMakeupCollection() {
   const pencil = new productModel({
+    username: "ajermasenoka@gmail.com",
     name: "Lippie Pencil",
     brand: "colourpop",
     price: "5.0",
@@ -40,6 +42,7 @@ function seedMakeupCollection() {
   })
 
   const foundation= new productModel({
+    username: "ajermasenoka@gmail.com",
     name: "No Filter Foundation",
     brand: "colourpop",
     price: "12.0",
@@ -48,6 +51,7 @@ function seedMakeupCollection() {
   })
 
   const lipstick = new productModel({
+    username: "aj161",
     name: "Lipstick",
     brand: "boosh",
     price: "26.0",
@@ -56,10 +60,11 @@ function seedMakeupCollection() {
   })
   
   const serum = new productModel({
+    username: "aj161",
     name: "Serum Foundation",
     brand: "deciem",
     price: "6.7",
-    imageUrl:"https://theordinary.com/dw/image/v2/BFKJ_PRD/on/demandware.static/-/Sites-deciem-master/default/dw8bf03c84/Images/products/The%20Ordinary/lifestyle/mas-rdn-serum-foundation-lifestyle.jpg?sw=1200&sh=1200&sm=fit",
+    imageUrl:"https://i.ebayimg.com/images/g/G~YAAOSwIDthQoiT/s-l500.jpg",
     description: "Serum Foundations are lightweight medium-coverage formulations available in a comprehensive shade range across 21 shades. These foundations offer moderate coverage that looks natural with a very lightweight serum feel. They are very low in viscosity and are dispensed with the supplied pump or with the optional glass dropper available for purchase separately if preferred. "
   });
 
@@ -69,7 +74,7 @@ pencil.save();
 serum.save();
 }
 
-//seedMakeupCollection();
+// seedMakeupCollection();
 
 // proof of life
 app.get("/products", getProductsHandler);
@@ -84,7 +89,8 @@ function getProductsHandler(req, res) {
   // res.send(catsData);
 
   // OR
-  productModel.find({}, function (err, productsData) {
+  let username = req.query.username;
+  productModel.find({username:username}, function (err, productsData) {
     if (err) {
       console.log("Did not work");
     } else {
@@ -116,17 +122,18 @@ productModel.find({ brand }, function(err,selectedProducts) {
 async function addProductHandler(req,res) {
   console.log(req.body);
   console.log(req.body.name);
+  const username =  req.body.username;
   const name = req.body.name;
   const brand = req.body.brand;
   const price = req.body.price;
   const imageUrl = req.body.imageUrl;
   const description = req.body.description;
   
-  let newProduct = await productModel.create({name, brand, price, imageUrl, description});
+  let newProduct = await productModel.create({username ,name, brand, price, imageUrl, description});
   
   productModel.find({}, function(err,allProducts) {
     if(err) {
-      response.send(`error in getting cats info >> ${err}`)
+      response.send(`error in getting products info >> ${err}`)
     } else {
       res.send(allProducts)
     }
@@ -136,6 +143,7 @@ async function addProductHandler(req,res) {
 // localhost:3001/product/6398da68cfbeecf6b97c2848 >> DELETE - using params
 async function deleteProductHandler(req,res){
   let id = req.params.id;
+  let username = user.email||user.nickname;
 
   productModel.findByIdAndDelete(id, async function(error, deletedProduct){
     if(error){
@@ -143,7 +151,7 @@ async function deleteProductHandler(req,res){
       res.send(`Error was encountered ${error}`);
     } else {
       console.log(deletedProduct);
-      let productsData = await productModel.find({});
+      let productsData = await productModel.find({username:username});
       res.send(productsData);
     }
     })
@@ -153,12 +161,12 @@ async function deleteProductHandler(req,res){
 async function updateProductHandler(req,res){
   console.log(req.params);
   console.log(req.body);
-  const {name, brand, price, imageUrl,description } = req.body;
+  const {username, name, brand, price, imageUrl,description } = req.body;
   const id = req.params.id;
   // or const {id} = req.params;
   const updatedProduct = await productModel.findByIdAndUpdate(id, {name, brand, price,imageUrl,description });
   console.log(updatedProduct);
-  let productsData = await productModel.find({});
+  let productsData = await productModel.find({username:username});
   res.send(productsData);
 }
 
