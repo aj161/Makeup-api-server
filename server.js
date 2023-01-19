@@ -84,6 +84,10 @@ app.post("/product", addProductHandler);
 app.delete('/product/:id', deleteProductHandler);
 app.put('/product/:id', updateProductHandler);
 
+app.get('/', (request, response) => {
+  response.status(200).send('API server is live');
+})
+
 function getProductsHandler(req, res) {
   // let catsData = await catModel.find({});
   // res.send(catsData);
