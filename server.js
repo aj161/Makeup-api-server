@@ -14,6 +14,7 @@ const PORT = process.env.PORT;
 // Connect my Node app to cat database in MongoDB server
 mongoose.connect(process.env.DATABASE_URL);
 
+console.log(process.env.DATABASE_URL);
 // Collection : Schema and model
 // Schema: determine the shape of our data || Blueprint or template for our collection
 
@@ -80,9 +81,9 @@ serum.save();
 app.get("/products", getProductsHandler);
 app.get("/products/:id", getProductByIdHandler);
 app.get("/productbybrand", getProductsByBrand);
-app.post("/product", addProductHandler);
-app.delete('/product/:id', deleteProductHandler);
-app.put('/product/:id', updateProductHandler);
+app.post("/product",cors(), addProductHandler);
+app.delete('/product/:id', cors(), deleteProductHandler);
+app.put('/product/:id', cors(), updateProductHandler);
 
 app.get('/', (request, response) => {
   response.status(200).send('API server is live');
